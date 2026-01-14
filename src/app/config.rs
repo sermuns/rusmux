@@ -55,9 +55,11 @@ pub fn get_project_yaml(project_name: &str) -> Result<Value, AppError> {
 
 /// Get existing projects in the configuration directory.
 pub fn get_projects() -> Result<Vec<String>, AppError> {
-    let pattern = config::get_path("*.yml")?;
+    let yml_pattern = config::get_path("*.yml")?;
+    let yaml_pattern = config::get_path("*.yaml")?;
 
-    let projects = glob(&pattern.to_string_lossy())?
+    let projects = glob(&yml_pattern.to_string_lossy())?
+        .chain(glob(&yaml_pattern.to_string_lossy())?)
         .filter_map(|path| {
             if let Ok(path) = path {
                 path.file_stem()
